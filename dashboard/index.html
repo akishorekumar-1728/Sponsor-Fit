@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>SponsorFit: choosing the right sport for your brand</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..125,500..800&family=Source+Sans+3:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F3F6F4; --surface:#FFFFFF; --ink:#13232B; --muted:#56676F; --line:#D8E1DD;
+  --accent:#0B7A85; --accent-ink:#FFFFFF; --hi:#F2B705; --soft:#E6F1EF;
+  --shadow:0 1px 2px rgba(19,35,43,.06),0 6px 18px rgba(19,35,43,.05);
+  --display:"Archivo","Arial Narrow",system-ui,sans-serif; --body:"Source Sans 3",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --rowH:88px;
+  box-sizing:border-box; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0D171B; --surface:#15232A; --ink:#E7F0EE; --muted:#93A6AD; --line:#26393F;
+    --accent:#3CC4CF; --accent-ink:#06282C; --hi:#F5C518; --soft:#173039; --shadow:0 1px 2px rgba(0,0,0,.4);
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0D171B; --surface:#15232A; --ink:#E7F0EE; --muted:#93A6AD; --line:#26393F;
+  --accent:#3CC4CF; --accent-ink:#06282C; --hi:#F5C518; --soft:#173039; --shadow:0 1px 2px rgba(0,0,0,.4);
+}
+html{height:100%;scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;min-height:100%;background:var(--bg);color:var(--ink);font:400 16px/1.55 var(--body);-webkit-font-smoothing:antialiased}
+h1,h2,h3{font-family:var(--display);margin:0;letter-spacing:-.01em;line-height:1.15}
+button,input,select{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--hi);outline-offset:2px;border-radius:4px}
+.num{font-variant-numeric:tabular-nums}
+
+/* top bar */
+.top{display:flex;align-items:center;gap:16px;padding:14px clamp(16px,3vw,32px);border-bottom:1px solid var(--line);background:var(--surface)}
+.brand{font:800 20px var(--display);font-stretch:112%;letter-spacing:-.02em}
+.brand span{color:var(--accent)}
+.scenario{color:var(--muted);font-size:14px;flex:1;min-width:0}
+.icon-btn{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:6px 12px;cursor:pointer;font-size:14px}
+.icon-btn:hover{border-color:var(--accent)}
+
+/* layout */
+.layout{display:grid;grid-template-columns:320px minmax(0,1fr);gap:24px;padding:24px clamp(16px,3vw,32px) 48px;max-width:1320px;margin:0 auto;align-items:start}
+@media (max-width:920px){.layout{grid-template-columns:1fr}}
+.controls{background:var(--surface);border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow);position:sticky;top:12px}
+@media (max-width:920px){.controls{position:static}}
+.controls summary{list-style:none;cursor:pointer;padding:14px 16px;font:700 16px var(--display);display:flex;justify-content:space-between;align-items:center}
+.controls summary::-webkit-details-marker{display:none}
+.controls .inner{padding:0 16px 16px}
+@media (min-width:921px){.controls summary{pointer-events:none}.controls summary .chev{display:none}}
+.presets{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 14px}
+.chip{border:1px solid var(--line);background:transparent;border-radius:999px;padding:5px 11px;font-size:13.5px;cursor:pointer}
+.chip[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.slider{margin:0 0 12px}
+.slider label{display:flex;justify-content:space-between;font-size:14.5px;gap:8px}
+.slider label b{font-weight:600}
+.slider .pct{color:var(--muted)}
+.slider small{display:block;color:var(--muted);font-size:12.5px;line-height:1.3;margin-top:1px}
+input[type=range]{width:100%;accent-color:var(--accent);margin:4px 0 0}
+.reset{margin-top:6px;width:100%}
+
+/* stage */
+.stage{min-width:0}
+.headline{background:var(--surface);border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow);padding:22px 24px;border-left:6px solid var(--accent)}
+.headline h1{font-size:clamp(24px,3.4vw,36px);font-stretch:108%;font-weight:800}
+.headline p{margin:8px 0 0;color:var(--muted);max-width:68ch}
+.tabs{display:flex;gap:4px;margin:20px 0 14px;border-bottom:1px solid var(--line);overflow-x:auto}
+.tab{background:none;border:0;border-bottom:3px solid transparent;padding:9px 11px;cursor:pointer;font:600 14px var(--body);color:var(--muted);white-space:nowrap}.tab small{font-weight:600;opacity:.75}
+.tab[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--accent)}
+.panel{display:none}.panel.on{display:block}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow);padding:18px 20px;margin-bottom:16px}
+.partTag{display:inline-block;background:var(--accent);color:#fff;font:700 11.5px var(--body);letter-spacing:.03em;padding:4px 10px;border-radius:999px;margin-bottom:10px}
+.obj{margin:6px 0 0;padding-left:20px;font-size:14.5px;line-height:1.55;color:var(--ink)}
+.obj li{margin-bottom:8px}
+table.concepts td{vertical-align:top;padding:10px 12px;font-size:14px;line-height:1.5;border-bottom:1px solid var(--line)}
+table.concepts td:first-child{width:30%;font-weight:600}
+.card h2{font-size:19px;margin-bottom:4px}
+.card .sub{color:var(--muted);font-size:14.5px;margin:0 0 12px;max-width:70ch}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media (max-width:1100px){.grid2{grid-template-columns:1fr}}
+
+/* leaderboard */
+.board{position:relative}
+.row{position:absolute;left:0;right:0;height:calc(var(--rowH) - 10px);display:grid;grid-template-columns:40px minmax(0,1fr);gap:12px;align-items:center;
+  padding:8px 10px;border:1px solid var(--line);border-radius:10px;background:var(--surface);cursor:pointer;
+  transition:transform .55s cubic-bezier(.2,.8,.2,1),border-color .2s}
+.row:hover{border-color:var(--accent)}
+.row[aria-expanded="true"]{border-color:var(--accent)}
+.rank{font:800 26px var(--display);text-align:center;color:var(--muted)}
+.row.first .rank{color:var(--accent)}
+.rhead{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.rname{font:700 17px var(--display)}
+.rname small{font:400 13px var(--body);color:var(--muted);margin-left:8px}
+.rscore{font:800 22px var(--display)}
+.bar{height:16px;background:var(--soft);border-radius:8px;overflow:hidden;display:flex;margin-top:6px}
+.seg{height:100%;transition:width .45s ease}
+.legend{display:flex;flex-wrap:wrap;gap:6px 14px;margin:12px 0 0;font-size:13px;color:var(--muted)}
+.legend i{display:inline-block;width:11px;height:11px;border-radius:3px;margin-right:5px;vertical-align:-1px}
+.detail{margin-top:14px;display:none}
+.detail.on{display:block}
+.detail .why{background:var(--soft);border-radius:10px;padding:14px 16px}
+.detail h3{font-size:17px}
+.detail table{width:100%;border-collapse:collapse;font-size:14px;margin-top:8px}
+.detail td{padding:4px 6px;border-bottom:1px solid var(--line)}
+.tag{display:inline-block;padding:1px 8px;border-radius:999px;font-size:12px;border:1px solid var(--line);color:var(--muted)}
+.tag.data{background:var(--soft);color:var(--accent);border-color:transparent;font-weight:600}
+
+/* charts */
+svg text{font-family:var(--body);fill:var(--muted);font-size:12px}
+svg .ttl{fill:var(--ink)}
+.tip{position:fixed;pointer-events:none;background:var(--ink);color:var(--bg);padding:8px 10px;border-radius:8px;font-size:12.5px;line-height:1.35;display:none;z-index:9;max-width:220px}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px}
+.callout{background:var(--soft);border-radius:10px;padding:12px 14px;font-size:14.5px;margin-top:10px}
+
+/* tables */
+.tbl{width:100%;border-collapse:collapse;font-size:14px}
+.tbl th{text-align:left;font-weight:600;color:var(--muted);padding:6px 8px;border-bottom:1px solid var(--line)}
+.tbl td{padding:7px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+.scroll{overflow-x:auto}
+.q-High{color:#1B7F4B}.q-Medium{color:#9A6B00}.q-Low{color:#B23A2E}
+.q-n\/a{color:var(--muted)}
+a{color:var(--accent)}
+.heat td.c{text-align:center;font-variant-numeric:tabular-nums}
+.warn{border-left:4px solid var(--hi);background:var(--soft);padding:10px 14px;border-radius:8px;font-size:14.5px;margin-bottom:14px}
+footer{color:var(--muted);font-size:13px;text-align:center;padding:0 16px 32px}
+@media (max-width:640px){
+  .scenario{display:none}
+  .rname{min-width:0}.rname small{display:block;margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:60vw}
+  .row{grid-template-columns:28px minmax(0,1fr);gap:8px}.rank{font-size:22px}
+  .headline{padding:16px 18px}
+}
+@media (prefers-reduced-motion:reduce){.row,.seg{transition:none}}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="brand">Sponsor<span>Fit</span></div>
+  <div class="scenario" id="scenario"></div>
+  <button class="icon-btn" id="themeBtn" aria-label="Switch light or dark theme">Theme</button>
+</header>
+
+<div class="layout">
+  <details class="controls" id="controls" open>
+    <summary>Your priorities <span class="chev" aria-hidden="true">Show / hide</span></summary>
+    <div class="inner">
+      <div class="presets" id="presets" role="group" aria-label="Priority presets"></div>
+      <div id="sliders"></div>
+      <button class="chip reset" id="resetBtn">Reset to brand default</button>
+    </div>
+  </details>
+
+  <section class="stage">
+    <div class="headline" aria-live="polite">
+      <h1 id="hl"></h1>
+      <p id="hl2"></p>
+    </div>
+
+    <div class="tabs" role="tablist" id="tabs">
+      <button class="tab" role="tab" data-p="case" aria-selected="true">Case</button>
+      <button class="tab" role="tab" data-p="rank" aria-selected="false">Ranking</button>
+      <button class="tab" role="tab" data-p="trade" aria-selected="false">Trade-offs</button>
+      <button class="tab" role="tab" data-p="robust" aria-selected="false">How sure?</button>
+      <button class="tab" role="tab" data-p="strategy" aria-selected="false">Strategy</button>
+      <button class="tab" role="tab" data-p="innovation" aria-selected="false">Innovation</button>
+      <button class="tab" role="tab" data-p="data" aria-selected="false">Data &amp; sources</button>
+    </div>
+
+    <div class="panel on" id="p-case">
+      <div class="card">
+        <span class="partTag">Case Understanding</span>
+        <h2>Case background</h2>
+        <p class="sub">India's sports-sponsorship industry reached about &#8377;16,633 crore in 2024, roughly seven times its 2008 size, but cricket alone takes about 81&ndash;89% of that money (GroupM ESP, 2025; WPP Media, 2025). Brands who cannot afford cricket, or don't want its clutter, are turning to kabaddi, football, badminton, hockey and distance running instead.</p>
+        <p class="sub">This project follows <b>FitFuel</b>, a hypothetical mid-size Indian health-drink brand. It targets 18&ndash;34 year-old urban and semi-urban consumers, has a fixed annual sponsorship budget of <b>&#8377;10 crore</b>, and wants both brand awareness and measurable trial and sales.</p>
+        <h2 style="margin-top:22px">Central problem</h2>
+        <p class="sub">Sponsorship is expensive, long-term and hard to reverse. Cricket offers unmatched reach at a price and clutter level a mid-size brand cannot easily justify; smaller sports are cheaper and closer to the target audience but reach far fewer people. <b>Which sport gives FitFuel the best balance of reach, fit, cost and risk, and how sure can we be about that answer?</b></p>
+        <h2 style="margin-top:22px">Objectives</h2>
+        <ul class="obj">
+          <li>Describe the market, audience and social context of six candidate sports.</li>
+          <li>Build a transparent, evidence-based scoring model (the Brand&ndash;Sport Fit Index).</li>
+          <li>Rank the sports with three methods and stress-test the ranking against changing priorities and data errors.</li>
+          <li>Propose a practical sponsorship strategy, budget split and KPIs, and state the model's limits.</li>
+        </ul>
+      </div>
+      <div class="card">
+        <span class="partTag">Application of Course Concepts</span>
+        <h2>How the syllabus applies to this case</h2>
+        <table class="tbl concepts">
+          <tbody>
+            <tr><td><b>Sponsorship &amp; the match-up hypothesis</b><br><span class="sub">Cornwell, Weeks &amp; Roy, 2005; Fleck &amp; Quester, 2007</span></td><td>Sponsorship transfers a sport's meaning to the brand, and works best when sponsor and sport share a logical link. A health drink fits endurance running more naturally than a generic cricket sponsorship &mdash; this is the <b>image congruence</b> criterion in the model.</td></tr>
+            <tr><td><b>Social identity &amp; fan behaviour</b><br><span class="sub">Tajfel &amp; Turner, 1979</span></td><td>Fans identify with regional and language communities. PKL broadcasts in Hindi, Tamil, Telugu and Kannada; football's fan base is concentrated in Kerala, Goa, West Bengal and the North-East. This feeds the <b>audience fit</b> and <b>engagement</b> criteria.</td></tr>
+            <tr><td><b>Commercialisation of sport</b><br><span class="sub">IPL media-rights and franchise economics</span></td><td>IPL's 2024&ndash;28 title deal (&#8377;500 cr/yr) versus PKL's historic title deal (&#8377;60 cr/yr) shows why cricket is expensive &mdash; this drives the <b>cost efficiency</b> criterion.</td></tr>
+            <tr><td><b>Entertainment &amp; digital media marketing</b></td><td>IPL 2025 reached 652M people digitally versus 537M on TV; sponsorship must be built as always-on content, not a one-off logo &mdash; reflected in the activation budget.</td></tr>
+            <tr><td><b>Prediction / decision models</b><br><span class="sub">Saaty 1980 (AHP), Hwang &amp; Yoon 1981 (TOPSIS), Shannon 1948 (entropy)</span></td><td>Three scoring methods combine the brand's judgement with objective data patterns; Monte Carlo simulation then predicts how often each sport would still win if priorities or data were slightly wrong.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="panel" id="p-rank">
+      <div class="card">
+        <span class="partTag">Analysis</span>
+        <h2>Brand–sport fit index</h2>
+        <p class="sub">Each bar is split by what contributes to the score. Select a sport to see why it ranks where it does.</p>
+        <div class="board" id="board"></div>
+        <div class="legend" id="legend"></div>
+        <div class="detail" id="detail"></div>
+        <p class="sub" style="margin-top:10px"><b>Chart:</b> stacked horizontal bar chart. Each bar = one sport's Brand&ndash;Sport Fit Index (0&ndash;100), split into the seven weighted criteria so you can see what drives the score. Click a bar to expand its full rating table.</p>
+      </div>
+      <div class="card">
+        <h2>What this analysis covers, and where</h2>
+        <table class="tbl">
+          <tbody>
+            <tr><td style="white-space:nowrap"><b>Market information</b></td><td>Industry size, cricket's revenue share, digital vs TV spend &mdash; Case tab and Data &amp; sources.</td></tr>
+            <tr><td style="white-space:nowrap"><b>Audience / fan behaviour</b></td><td>Audience-brand fit, engagement scores, regional/language patterns &mdash; this Ranking tab and Data &amp; sources.</td></tr>
+            <tr><td style="white-space:nowrap"><b>Business information</b></td><td>Title-sponsorship prices (IPL vs PKL), cost efficiency, budget split &mdash; this tab and Findings &amp; Strategy.</td></tr>
+            <tr><td style="white-space:nowrap"><b>Social factors</b></td><td>Fan identity, language/region loyalty, risk from clutter and instability &mdash; Case tab and image-congruence/risk scores here.</td></tr>
+            <tr><td style="white-space:nowrap"><b>Performance statistics</b></td><td>PKL/ISL viewership trends, growth %, TOPSIS vs weighted-sum comparison &mdash; Trade-offs and How sure are we? tabs.</td></tr>
+            <tr><td style="white-space:nowrap"><b>Datasets</b></td><td>Full sourced indicator table, cleaning log and per-sport scores &mdash; Data &amp; sources tab.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="panel" id="p-trade">
+      <div class="card">
+        <span class="partTag">Analysis (trade-offs &amp; performance statistics)</span>
+        <h2>How much does reach have to matter?</h2>
+        <p class="sub">Each line shows a sport's score as the weight on audience reach changes and your other priorities keep their relative sizes. Move your pointer across the chart to read the scores.</p>
+        <div id="sweep"></div>
+        <div class="callout" id="sweepNote"></div>
+        <p class="sub" style="margin-top:10px"><b>Chart:</b> line chart (break-even analysis). X-axis = weight given to audience reach (0&ndash;100%); Y-axis = each sport's Fit Index. The dashed vertical line is your current reach weight; the dotted line is where cricket overtakes the leader.</p>
+      </div>
+      <div class="grid2">
+        <div class="card"><h2>Reach against cost</h2><p class="sub"><b>Chart:</b> bubble chart. X-axis = cost efficiency (10 = cheapest per unit of reach), Y-axis = audience reach, bubble size = audience-brand fit. Sports with similar scores overlap.</p><div id="scatter"></div></div>
+        <div class="card"><h2>Compare profiles</h2><p class="sub"><b>Chart:</b> radar/spider chart with one axis per criterion (0&ndash;10). Pick sports below to overlay their shapes and compare strengths at a glance.</p><div class="chips" id="radarChips"></div><div id="radar"></div></div>
+      </div>
+    </div>
+
+    <div class="panel" id="p-robust">
+      <div class="card">
+        <span class="partTag">Analysis (statistical robustness)</span>
+        <h2>How often does each sport come first?</h2>
+        <p class="sub">We change your weights at random thousands of times and count how often each sport ranks first. Turn the slider to make the simulation more or less uncertain about your priorities. This tests the weights only. The scores themselves are ratings, so check them against your own survey.</p>
+        <div class="slider" style="max-width:420px">
+          <label for="conc"><b>Uncertainty about your weights</b><span class="pct" id="concV"></span></label>
+          <input type="range" id="conc" min="4" max="60" value="30" aria-describedby="concHelp">
+          <small id="concHelp">Left: weights could be far from what you set. Right: weights stay close.</small>
+        </div>
+        <div id="mc"></div>
+        <p class="sub" style="margin-top:10px"><b>Chart:</b> bar chart from 10,000 Monte Carlo simulations of randomised priority weights. Bar height = % of simulations where that sport ranked #1. <b>Table below:</b> full rank-1..6 probability breakdown for every sport.</p>
+        <div class="scroll"><table class="tbl heat" id="mcTable"></table></div>
+      </div>
+    </div>
+
+    <div class="panel" id="p-strategy">
+      <div class="card">
+        <span class="partTag">Findings &amp; Proposed Solution</span>
+        <h2>Major findings</h2>
+        <ul class="obj">
+          <li><b>Running is the best fit for FitFuel's stated priorities.</b> It has the highest audience fit and image congruence, and wins the primary model in nearly every scenario tested.</li>
+          <li><b>Kabaddi is the most consistent second choice</b> &mdash; it ranks second under all three scoring methods (weighted-sum, TOPSIS, entropy), even though those methods disagree on who comes first.</li>
+          <li><b>Cricket only wins if reach dominates the decision</b> (roughly 38% weight or more &mdash; see Trade-offs). Its very low cost efficiency and heavy sponsor clutter make it a poor fit for a &#8377;10&nbsp;crore budget.</li>
+          <li><b>The evidence is uneven.</b> Only audience reach is built from measured data; the other six criteria are expert ratings backed by cited sources, so the ranking was stress-tested (see "How sure are we?") rather than taken at face value.</li>
+        </ul>
+        <h2 style="margin-top:22px">Proposed strategy: a two-anchor portfolio</h2>
+        <p class="sub">Primary partnership in <b>distance running</b> (city marathons, 10K series, run clubs) and a secondary partnership in the <b>Pro Kabaddi League</b> at team/category level, with a ring-fenced budget for digital content, activation and measurement.</p>
+      </div>
+      <div class="card">
+        <h2>Splitting the budget</h2>
+        <p class="sub">The two best-scoring sports share the money in proportion to their squared scores, after setting aside a share for content, activation and measurement. Treat it as a starting point for negotiation.</p>
+        <div style="display:flex;gap:20px;flex-wrap:wrap;margin-bottom:14px">
+          <div class="slider" style="min-width:200px"><label for="bud"><b>Budget</b><span class="pct" id="budV"></span></label><input type="range" id="bud" min="2" max="50" step="0.5" value="10"></div>
+          <div class="slider" style="min-width:200px"><label for="res"><b>Set aside for activation</b><span class="pct" id="resV"></span></label><input type="range" id="res" min="0" max="40" value="20"></div>
+        </div>
+        <div id="budBar"></div>
+        <p class="sub" style="margin-top:10px"><b>Chart:</b> horizontal budget-split bar. <b>Table below:</b> exact rupee-crore allocation per sport plus the activation reserve.</p>
+        <div class="scroll"><table class="tbl" id="budTable"></table></div>
+      </div>
+      <div class="card">
+        <h2>Activation plan &amp; KPIs</h2>
+        <table class="tbl concepts">
+          <tbody>
+            <tr><td><b>Running</b></td><td>Hydration/recovery stations at city runs, a run-club programme, free fitness-app challenges, mid-tier athlete ambassadors. Negotiate category exclusivity first &mdash; other nutrition/water brands already sponsor major marathons.</td></tr>
+            <tr><td><b>Kabaddi</b></td><td>Regional-language content (Tamil, Telugu, Kannada, Hindi), YouTube highlight clips, in-match sampling, a free-to-play (no money) prediction quiz.</td></tr>
+            <tr><td><b>KPIs</b></td><td>Brand recall (pre/post pulse survey), trial &amp; redemption (unique codes), content engagement (platform analytics), sentiment (free NLP), sales uplift in activated regions vs control regions.</td></tr>
+          </tbody>
+        </table>
+        <p class="sub" style="margin-top:10px">Review each season: shift toward cricket-style digital/OTT ad packages only if the brand's goal moves toward mass awareness (reach weight above ~38%); increase kabaddi if reach targets are missed.</p>
+      </div>
+    </div>
+
+    <div class="panel" id="p-innovation">
+      <div class="card">
+        <span class="partTag">Innovation &amp; Practical Relevance</span>
+        <h2>What makes this approach original</h2>
+        <ul class="obj">
+          <li><b>Transparent data pipeline</b> &mdash; every indicator carries a source, year and quality grade; cleaning steps are logged; imputed values (like running's reach) are flagged rather than hidden.</li>
+          <li><b>Decision map &amp; break-even test</b> &mdash; instead of one static winner, the model shows exactly how much the brand's priorities would need to shift before the recommendation changes (see Trade-offs).</li>
+          <li><b>Two-layer uncertainty testing</b> &mdash; Monte Carlo simulation on both the priority weights and the rating scores shows how far the answer can be trusted, not just what the answer is.</li>
+          <li><b>Free, no-install interactive dashboard</b> &mdash; this single HTML file runs in any browser; a marketing manager can change priorities with sliders and see every chart update live, with zero setup cost.</li>
+        </ul>
+        <h2 style="margin-top:22px">Emerging technology used</h2>
+        <ul class="obj">
+          <li>OTT/YouTube-first distribution and digital reach data (IPL 2025 digital reach: 652M vs 537M TV).</li>
+          <li>AI-based sentiment analysis of fan comments (free Hugging Face models) as a proposed KPI.</li>
+          <li>Fitness-app and wearable integration for running-challenge activation.</li>
+          <li>Google Trends as a free, optional demand-growth signal (see <code>fetch_trends.py</code> in the project files).</li>
+        </ul>
+        <h2 style="margin-top:22px">Limitations (stated for transparency)</h2>
+        <p class="sub">Six of seven criteria are expert ratings, not measured values. Running's reach is imputed because it is a participation sport with no comparable TV/OTT audience figure. Cost efficiency is a relative index, not real rate-card pricing, and the PKL title-price benchmark is from 2017. A real fan survey (template included in the project files) would sharpen the audience-fit and engagement scores.</p>
+      </div>
+    </div>
+
+    <div class="panel" id="p-data">
+      <div class="warn" id="dataWarn"></div>
+      <div class="card"><h2>What the model uses</h2><p class="sub">Reach comes from published audience-survey data. The other six criteria are expert ratings with the evidence noted, and should be checked against your own fan survey.</p><p class="sub"><b>Table:</b> every sport&rsquo;s 7 criterion scores (1&ndash;10) with a tag showing whether each came from data or an expert rating.</p><div class="scroll"><table class="tbl" id="modelTable"></table></div></div>
+      <div class="card"><h2>Sourced indicators</h2><p class="sub"><b>Table:</b> every raw number collected for this project &mdash; sport, indicator, value, year, evidence quality, and a clickable source link.</p><div class="scroll"><table class="tbl" id="rawTable"></table></div></div>
+      <div class="card"><h2>How the data was cleaned</h2><p class="sub"><b>List:</b> the exact preprocessing steps run on the raw indicators (yardstick choice, conflict resolution, missing-data handling, scaling) &mdash; see Section 5.2 of the written report.</p><ol id="cleanLog"></ol></div>
+    </div>
+  </section>
+</div>
+<div class="tip" id="tip" role="presentation"></div>
+<footer>SponsorFit is a student case study. Scores are estimates from public reports. Check the sources before you rely on them.</footer>
+
+<script>
+const DATA = {"scenario": "FitFuel: a mid-size health-drink brand, target 18-34, budget Rs 10 crore", "criteria": [{"key": "reach", "label": "Audience reach", "hint": "How many people follow the sport (published audience data)."}, {"key": "audience_fit", "label": "Audience-brand fit", "hint": "Do the fans match your 18-34 buyers?"}, {"key": "engagement", "label": "Fan engagement", "hint": "How passionate and active are the fans?"}, {"key": "image_congruence", "label": "Image congruence", "hint": "Does the sport's image suit a health brand?"}, {"key": "cost_efficiency", "label": "Cost efficiency", "hint": "Value for money, allowing for sponsor clutter."}, {"key": "growth", "label": "Growth trend", "hint": "Is interest in the sport rising?"}, {"key": "risk_safety", "label": "Risk safety", "hint": "Stability of the league, stars and rules."}], "sports": [{"sport": "Cricket", "property": "IPL / WPL", "rationale": "Cricket = ~81% of sponsorship spend (2025) so inventory is expensive and cluttered; fans skew 18-44; IPL TV watch time up 22% in 2025 opening weekend; generic image fit for a health brand.", "confidence": "Medium", "audience_base_m": 612.0, "reach_imputed": false, "reach": 10.0, "audience_fit": 8.0, "engagement": 9.0, "image_congruence": 6.0, "cost_efficiency": 2.0, "growth": 7.0, "risk_safety": 7.0}, {"sport": "Kabaddi", "property": "Pro Kabaddi League (PKL)", "rationale": "Most-watched non-cricket league; regional-language broadcasts; physical/strength image suits nutrition; sponsor retention reported positive; S11 reach dipped vs S10.", "confidence": "Medium", "audience_base_m": 280.0, "reach_imputed": false, "reach": 3.6, "audience_fit": 8.0, "engagement": 7.0, "image_congruence": 8.0, "cost_efficiency": 8.0, "growth": 8.0, "risk_safety": 7.0}, {"sport": "Football", "property": "Indian Super League (ISL)", "rationale": "Strong regional pockets (Kerala, Goa, Bengal, NE); ISL TV reach fell from 168M (2018-19) to 81M (2023) and league finances have been unstable, so risk is high.", "confidence": "Low", "audience_base_m": 305.0, "reach_imputed": false, "reach": 4.08, "audience_fit": 7.0, "engagement": 6.0, "image_congruence": 7.0, "cost_efficiency": 6.0, "growth": 6.0, "risk_safety": 4.0}, {"sport": "Badminton", "property": "Badminton (PBL / BWF events / star athletes)", "rationale": "Star-athlete driven; endorsement route cheaper than league sponsorship; strong health image but dependence on a few athletes.", "confidence": "Low", "audience_base_m": 145.0, "reach_imputed": false, "reach": 1.0, "audience_fit": 7.0, "engagement": 6.0, "image_congruence": 8.0, "cost_efficiency": 7.0, "growth": 6.0, "risk_safety": 6.0}, {"sport": "Hockey", "property": "Hockey India League / national team", "rationale": "Cost-efficient but interest spikes mainly around Olympics; limited league commercial ecosystem.", "confidence": "Low", "audience_base_m": 154.0, "reach_imputed": false, "reach": 1.17, "audience_fit": 6.0, "engagement": 5.0, "image_congruence": 7.0, "cost_efficiency": 8.0, "growth": 6.0, "risk_safety": 6.0}, {"sport": "Running", "property": "Distance running / marathons / athletics", "rationale": "Participants match the health-conscious 18-34 buyer; record turnouts (e.g. 69,000+ at Tata Mumbai Marathon 2026, TCS World 10K +21.5%); direct sampling possible; distance running reported as a large share of non-cricket sponsorship.", "confidence": "Medium", "audience_base_m": 145.0, "reach_imputed": true, "reach": 1.0, "audience_fit": 9.0, "engagement": 7.0, "image_congruence": 10.0, "cost_efficiency": 8.0, "growth": 8.0, "risk_safety": 8.0}], "weights": {"ahp": [0.14570712773693412, 0.22807816597847572, 0.08176914515298114, 0.18885145311045753, 0.22807816597847566, 0.07732260068327643, 0.050193341359399284], "entropy": [0.7285333486268101, 0.01640573389734994, 0.034098472591814324, 0.025837299170698363, 0.13678366143825949, 0.01708050172613557, 0.0412609825489322]}, "ahp_cr": 0.009922325768075734, "raw": [{"sport": "Cricket", "indicator": "audience_base", "value": 612.0, "unit": "million people", "year": "2023-24", "used_in_model": 1, "quality": "High", "source": "Ormax Sports Audience Report 2024", "url": "https://www.ormaxmedia.com/insights/stories/678-million-sports-audiences-in-india-game-on.html", "note": "Sports audience = watched sports on TV/OTT for 30+ min in last year; survey of 12,000 people. One summary lists 650M; official Ormax page and most outlets say 612M."}, {"sport": "Kabaddi", "indicator": "audience_base", "value": 280.0, "unit": "million people", "year": "2023-24", "used_in_model": 1, "quality": "High", "source": "Ormax Sports Audience Report 2024 (official page)", "url": "https://www.ormaxmedia.com/insights/stories/678-million-sports-audiences-in-india-game-on.html", "note": "Some outlets print 208M (likely transposition). Official Ormax page says 280M, so 280 is used. Both rank kabaddi 3rd."}, {"sport": "Kabaddi", "indicator": "audience_base_alt", "value": 208.0, "unit": "million people", "year": "2023-24", "used_in_model": 0, "quality": "Low", "source": "Exchange4media / Indian Television (reporting Ormax)", "url": "https://www.exchange4media.com/marketing-news/india-has-678-million-sports-audiences-ormax-report-133273.html", "note": "Conflicting report; not used (kept for the data-cleaning log)."}, {"sport": "Football", "indicator": "audience_base", "value": 305.0, "unit": "million people", "year": "2023-24", "used_in_model": 1, "quality": "High", "source": "Ormax Sports Audience Report 2024", "url": "https://www.ormaxmedia.com/insights/stories/678-million-sports-audiences-in-india-game-on.html", "note": ""}, {"sport": "Hockey", "indicator": "audience_base", "value": 154.0, "unit": "million people", "year": "2023-24", "used_in_model": 1, "quality": "Medium", "source": "Khel Now (reporting Ormax 2024)", "url": "https://khelnow.com/olympics/most-followed-sports-in-india-202403", "note": "Secondary report of Ormax figures."}, {"sport": "Badminton", "indicator": "audience_base", "value": 145.0, "unit": "million people", "year": "2023-24", "used_in_model": 1, "quality": "Medium", "source": "Khel Now (reporting Ormax 2024)", "url": "https://khelnow.com/olympics/most-followed-sports-in-india-202403", "note": "Secondary report of Ormax figures."}, {"sport": "Running", "indicator": "audience_base", "value": "", "unit": "million people", "year": "", "used_in_model": 1, "quality": "", "source": "Not measured by Ormax (TV/OTT-based definition)", "url": "", "note": "MISSING: running is a participation sport, so a TV/OTT audience base is not comparable. Handled in preprocessing (see log)."}, {"sport": "Cricket", "indicator": "ipl_tv_reach_2025", "value": 537.0, "unit": "million people", "year": "2025", "used_in_model": 0, "quality": "Medium", "source": "JioStar 'TATA IPL 2025: A Year of Firsts' report", "url": "https://www.jiostar.com/news/from-stadiums-to-screens-jiostars-tata-ipl-2025-a-year-of-firsts-report-highlights-how-a-billion-viewers-came-together-to-celebrate-cricket/", "note": "Plus 652M digital reach (broadcaster-reported)."}, {"sport": "Cricket", "indicator": "share_of_sponsorship_spend", "value": 81.0, "unit": "percent", "year": "2025", "used_in_model": 0, "quality": "Medium", "source": "WPP Media / GroupM ESP Sporting Nation 2025", "url": "https://www.wppmedia.com/news/sporting-nation-india-sports-sponsorship-report-2025", "note": "Cricket also 89% of total industry revenue in 2025."}, {"sport": "Kabaddi", "indicator": "pkl_tv_reach_s8", "value": 184.0, "unit": "million people", "year": "2021-22", "used_in_model": 0, "quality": "Medium", "source": "BARC as reported by Leaders in Sport", "url": "https://leadersinsport.com/sport-business/leaders-events/leaders-sport-awards/2025-shortlist/from-mud-to-mat-transforming-kabaddi-into-indias-fastest-growing-sport/", "note": ""}, {"sport": "Kabaddi", "indicator": "pkl_tv_reach_s10", "value": 225.0, "unit": "million people", "year": "2023", "used_in_model": 0, "quality": "Medium", "source": "BARC as reported by Leaders in Sport", "url": "https://leadersinsport.com/sport-business/leaders-events/leaders-sport-awards/2025-shortlist/from-mud-to-mat-transforming-kabaddi-into-indias-fastest-growing-sport/", "note": ""}, {"sport": "Kabaddi", "indicator": "pkl_tv_reach_s11", "value": 201.0, "unit": "million people", "year": "2024", "used_in_model": 0, "quality": "Medium", "source": "BARC as reported by Leaders in Sport", "url": "https://leadersinsport.com/sport-business/leaders-events/leaders-sport-awards/2025-shortlist/from-mud-to-mat-transforming-kabaddi-into-indias-fastest-growing-sport/", "note": "Down from S10 but most-watched non-cricket league of 2024."}, {"sport": "Football", "indicator": "isl_unique_viewership_2024_25", "value": 157.2, "unit": "million people", "year": "2024-25", "used_in_model": 0, "quality": "Medium", "source": "YouGov, 'The beautiful game in India'", "url": "https://yougov.com/articles/52245-the-beautiful-game-in-india", "note": "+18% vs previous season."}, {"sport": "Football", "indicator": "isl_tv_reach_2018_19", "value": 168.0, "unit": "million people", "year": "2018-19", "used_in_model": 0, "quality": "Medium", "source": "BARC as reported in Business Standard", "url": "https://www.pressreader.com/india/business-standard/20191030/282106343434331", "note": ""}, {"sport": "Football", "indicator": "isl_tv_reach_2023", "value": 81.0, "unit": "million people", "year": "2023", "used_in_model": 0, "quality": "Medium", "source": "GroupM via Statista", "url": "https://www.statista.com/statistics/1416957/india-isl-reach-by-team-television/", "note": "TV reach roughly halved between 2018-19 and 2023 (supports lower risk_safety)."}, {"sport": "Running", "indicator": "tata_mumbai_marathon_participants", "value": 69000.0, "unit": "participants", "year": "2026", "used_in_model": 0, "quality": "Low", "source": "Aguante blog (trade summary)", "url": "https://aguante.in/blogs/activewear-news/indias-running-community-grows-with-surge-in-major-marathons-and-events", "note": "Also: Delhi Half 40,000+ (2025), Hyderabad 28,300 (2025), Ahmedabad 24,000+ (2025), TCS World 10K open category 16,000+ finishers (+21.5%)."}, {"sport": "Cricket", "indicator": "ipl_title_sponsorship_cost_per_year", "value": 500.0, "unit": "crore per year", "year": "2024-28", "used_in_model": 0, "quality": "High", "source": "ESPNcricinfo / BCCI: Tata Rs 2,500 cr for 2024-28", "url": "https://espncricinfo.com/story/tata-group-secures-ipl-title-sponsorship-rights-for-2024-28-for-inr-2500-crore-1417400", "note": "Cost cross-check only. About Rs 0.93 cr of title-sponsor price per million TV reach (537M)."}, {"sport": "Kabaddi", "indicator": "pkl_title_sponsorship_cost_per_year", "value": 60.0, "unit": "crore per year", "year": "2017-21", "used_in_model": 0, "quality": "Low", "source": "Exchange4media: Vivo deal pegged at Rs 275-300 cr over 5 years", "url": "https://www.exchange4media.com/marketing-news/vivo-to-sponsor-pro-kabaddi-leaguedeal-pegged-at-rs-275-300-crore-68709.html", "note": "Cost cross-check only. DATED (2017): about Rs 0.30 cr per million TV reach (201M), roughly 3x cheaper than IPL; current price is probably higher."}, {"sport": "Running", "indicator": "marathon_sponsorship_growth", "value": 15.0, "unit": "percent", "year": "2024", "used_in_model": 0, "quality": "Medium", "source": "Storyboard18: marathon sponsorships growing about 15% a year", "url": "https://www.storyboard18.com/amp/brand-makers/marathon-sponsorships-surge-by-15-brands-drive-engagement-48455.htm", "note": "Growth cross-check only. Tata Mumbai Marathon expected about Rs 60 cr sponsorship revenue (Jan 2025). Sponsors include Fast&Up and Bisleri, so category clutter is a risk for a health-drink brand."}], "log": ["Raw indicator rows: 19; sports: 6; expert-rated sports: 6", "Step 1: yardstick = Ormax audience_base (million people).", "Step 2: conflicting value for Kabaddi (208.0M from Exchange4media / Indian Television (reporting Ormax)) ignored; primary source value 280M used.", "Step 3: Running has no comparable audience base -> imputed with observed minimum (145M); flagged as imputed because participation, not TV/OTT viewing, is its reach.", "Step 4: min-max scaling reach = 1 + 9*(x - 145)/(612 - 145).", "Step 5: saved 6 rows x 13 columns to sports_scores.csv"], "notes": "The brand-default weights come from pairwise comparisons (consistency ratio 0.01, below the 0.10 limit)."};
+</script>
+<script>
+(function(){
+"use strict";
+const C = DATA.criteria;                       // [{key,label,hint}]
+const KEYS = C.map(c=>c.key);
+const S = DATA.sports;                         // sports with scores
+const COLORS = {Cricket:"#E4572E",Kabaddi:"#17A9A6",Football:"#5E9C2E",Badminton:"#D9A800",Hockey:"#2E86AB",Running:"#8E4FB0"};
+const CCOL = ["#4E79A7","#F28E2B","#E15759","#76B7B2","#59A14F","#EDC948","#B07AA1"];
+const $ = (s,r=document)=>r.querySelector(s);
+const svgNS = "http://www.w3.org/2000/svg";
+const fmt1 = x=>(Math.round(x*10)/10).toFixed(1);
+
+/* ---------- model ---------- */
+const mins = KEYS.map(k=>Math.min(...S.map(s=>s[k]))), maxs = KEYS.map(k=>Math.max(...S.map(s=>s[k])));
+const NORM = S.map(s=>KEYS.map((k,j)=>(maxs[j]-mins[j])?(s[k]-mins[j])/(maxs[j]-mins[j]):0));
+const normW = w=>{const t=w.reduce((a,b)=>a+b,0)||1;return w.map(x=>x/t)};
+const wsm = w=>{const n=normW(w);return NORM.map(r=>100*r.reduce((a,v,j)=>a+v*n[j],0))};
+function topsis(w){
+  const n=normW(w), norms=KEYS.map(k=>Math.sqrt(S.reduce((a,s)=>a+s[k]*s[k],0)));
+  const V=S.map(s=>KEYS.map((k,j)=>s[k]/norms[j]*n[j]));
+  const best=KEYS.map((_,j)=>Math.max(...V.map(r=>r[j]))), worst=KEYS.map((_,j)=>Math.min(...V.map(r=>r[j])));
+  return V.map(r=>{const db=Math.sqrt(r.reduce((a,v,j)=>a+(v-best[j])**2,0)),dw=Math.sqrt(r.reduce((a,v,j)=>a+(v-worst[j])**2,0));return 100*dw/(db+dw)});
+}
+function sweep(w, j, steps=101){
+  const n=normW(w), rest=n.reduce((a,v,i)=>i===j?a:a+v,0)||1, out=[];
+  for(let i=0;i<steps;i++){const x=i/(steps-1), ww=n.map((v,q)=>q===j?x:v/rest*(1-x)); out.push({x:x*100,s:wsm(ww)})}
+  return out;
+}
+function breakEven(sw, si){ // smallest x where sport si leads
+  for(const p of sw){ if(p.s.indexOf(Math.max(...p.s))===si) return p.x } return null;
+}
+function rng(seed){return function(){seed|=0;seed=seed+0x6D2B79F5|0;let t=Math.imul(seed^seed>>>15,1|seed);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+function gamma(a,r){ // Marsaglia-Tsang, works for a<1 too
+  if(a<1){return gamma(a+1,r)*Math.pow(r(),1/a)}
+  const d=a-1/3,c=1/Math.sqrt(9*d);
+  for(;;){let x,v;do{const u1=r(),u2=r();x=Math.sqrt(-2*Math.log(u1||1e-12))*Math.cos(2*Math.PI*u2);v=1+c*x}while(v<=0);
+    v=v*v*v;const u=r();if(u<1-.0331*x**4||Math.log(u||1e-12)<.5*x*x+d*(1-v+Math.log(v)))return d*v}
+}
+function monteCarlo(w, conc, n=4000){
+  const r=rng(42), base=normW(w), alpha=base.map(b=>Math.max(b*conc,.05)), m=S.length;
+  const cnt=S.map(()=>Array(m).fill(0));
+  for(let i=0;i<n;i++){
+    const g=alpha.map(a=>gamma(a,r)), t=g.reduce((a,b)=>a+b,0), ww=g.map(x=>x/t), sc=wsm(ww);
+    const order=sc.map((v,i)=>[v,i]).sort((a,b)=>b[0]-a[0]);
+    order.forEach((o,rk)=>cnt[o[1]][rk]++);
+  }
+  return cnt.map(row=>row.map(v=>v/n));
+}
+function allocate(scores, budget, reservePct){
+  const idx=scores.map((v,i)=>[v,i]).sort((a,b)=>b[0]-a[0]).slice(0,2);
+  const p=idx.map(([v])=>v*v), t=p.reduce((a,b)=>a+b,0), pool=100-reservePct;
+  const rows=idx.map(([v,i],q)=>({name:S[i].sport,score:v,pct:p[q]/t*pool,cr:p[q]/t*pool/100*budget}));
+  rows.push({name:"Content, activation and measurement",score:null,pct:reservePct,cr:budget*reservePct/100});
+  return rows;
+}
+
+/* ---------- state ---------- */
+const state = {w: DATA.weights.ahp.slice(), preset:"ahp", open:null, radar:null, tab:"case"};
+const PRESETS = [
+  {id:"ahp",label:"Brand default",w:DATA.weights.ahp},
+  {id:"entropy",label:"Let the data decide",w:DATA.weights.entropy},
+  {id:"reach",label:"Reach first",w:KEYS.map(k=>k==="reach"?.5:.5/(KEYS.length-1))},
+  {id:"fit",label:"Fit and image first",w:KEYS.map(k=>(k==="audience_fit"||k==="image_congruence")?.35:.3/(KEYS.length-2))},
+  {id:"cost",label:"Tight budget",w:KEYS.map(k=>k==="cost_efficiency"?.5:.5/(KEYS.length-1))}
+];
+
+/* ---------- controls ---------- */
+function buildControls(){
+  $("#scenario").textContent = DATA.scenario;
+  const pr=$("#presets");
+  PRESETS.forEach(p=>{const b=document.createElement("button");b.className="chip";b.textContent=p.label;b.dataset.id=p.id;b.setAttribute("aria-pressed",p.id===state.preset);
+    b.onclick=()=>{state.w=p.w.slice();state.preset=p.id;syncSliders();render()};pr.appendChild(b)});
+  const sl=$("#sliders");
+  C.forEach((c,j)=>{
+    const d=document.createElement("div");d.className="slider";
+    d.innerHTML=`<label for="s${j}"><b>${c.label}</b><span class="pct num" id="pv${j}"></span></label>
+      <input type="range" id="s${j}" min="0" max="100" step="1"><small>${c.hint}</small>`;
+    sl.appendChild(d);
+    $("#s"+j).addEventListener("input",e=>{state.w[j]=+e.target.value;state.preset=null;render()});
+  });
+  $("#resetBtn").onclick=()=>{state.w=DATA.weights.ahp.slice();state.preset="ahp";syncSliders();render()};
+  const det=$("#controls"), mq=matchMedia("(min-width:921px)");
+  const fix=()=>{det.open=mq.matches};fix();mq.addEventListener("change",fix);
+}
+function syncSliders(){ const n=normW(state.w); C.forEach((c,j)=>{$("#s"+j).value=Math.round(n[j]*100)}); }
+function updateSliderLabels(){ const n=normW(state.w); C.forEach((c,j)=>{$("#pv"+j).textContent=Math.round(n[j]*100)+"%"});
+  document.querySelectorAll("#presets .chip").forEach(b=>b.setAttribute("aria-pressed",b.dataset.id===state.preset)); }
+
+/* ---------- ranking ---------- */
+function buildBoard(){
+  const b=$("#board"); b.style.height=(S.length*88)+"px";
+  S.forEach((s,i)=>{
+    const r=document.createElement("div");r.className="row";r.id="row"+i;r.tabIndex=0;r.setAttribute("role","button");r.setAttribute("aria-expanded","false");
+    r.innerHTML=`<div class="rank num"></div><div><div class="rhead"><div class="rname">${s.sport}<small>${s.property}</small></div><div class="rscore num"></div></div><div class="bar"></div></div>`;
+    const act=()=>{state.open=(state.open===i?null:i);renderDetail();document.querySelectorAll(".row").forEach((x,q)=>x.setAttribute("aria-expanded",state.open===q))};
+    r.onclick=act;r.onkeydown=e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();act()}};
+    b.appendChild(r);
+  });
+  $("#legend").innerHTML=C.map((c,j)=>`<span><i style="background:${CCOL[j]}"></i>${c.label}</span>`).join("");
+}
+function renderBoard(sc){
+  const n=normW(state.w), order=sc.map((v,i)=>[v,i]).sort((a,b)=>b[0]-a[0]);
+  order.forEach(([v,i],rk)=>{
+    const r=$("#row"+i); r.style.transform=`translateY(${rk*88}px)`; r.classList.toggle("first",rk===0);
+    r.querySelector(".rank").textContent=rk+1; r.querySelector(".rscore").textContent=fmt1(v);
+    r.querySelector(".bar").innerHTML=NORM[i].map((x,j)=>`<div class="seg" style="width:${x*n[j]*100}%;background:${CCOL[j]}" title="${C[j].label}: ${fmt1(x*n[j]*100)} points"></div>`).join("");
+  });
+  return order;
+}
+function renderDetail(){
+  const d=$("#detail"); if(state.open===null){d.classList.remove("on");d.innerHTML="";return}
+  const s=S[state.open]; d.classList.add("on");
+  const rows=C.map((c,j)=>`<tr><td>${c.label}</td><td class="num">${s[c.key]%1?s[c.key].toFixed(1):s[c.key]}/10</td><td>${c.key==="reach"?'<span class="tag data">from data</span>':'<span class="tag">expert rating</span>'}</td></tr>`).join("");
+  d.innerHTML=`<div class="why"><h3>${s.sport}: ${s.property}</h3><p style="margin:6px 0 0">${s.rationale}</p>
+    <table><tbody>${rows}</tbody></table>
+    <p style="margin:8px 0 0;font-size:13.5px;color:var(--muted)">Audience base: ${s.reach_imputed?"no comparable TV or OTT audience, so reach is set to the lowest observed value":Math.round(s.audience_base_m)+" million people"}. Confidence in expert ratings: ${s.confidence}.</p></div>`;
+}
+function renderHeadline(sc, order){
+  const lead=S[order[0][1]].sport, second=S[order[1][1]].sport, gap=order[0][0]-order[1][0];
+  $("#hl").textContent = `${lead} is the best fit, ${fmt1(gap)} points ahead of ${second}`;
+  const j=KEYS.indexOf("reach"), sw=sweep(state.w,j), ci=S.findIndex(s=>s.sport==="Cricket"), be=breakEven(sw,ci);
+  const cur=normW(state.w)[j]*100;
+  let extra;
+  if(lead==="Cricket") extra="Cricket leads because reach counts for a lot in these priorities.";
+  else if(be===null) extra="Cricket does not lead at any weight on reach.";
+  else extra=`Cricket only takes first place if reach counts for about ${Math.round(be)}% of the decision. Right now it counts for ${Math.round(cur)}%.`;
+  $("#hl2").textContent = extra+" Change your priorities to test it.";
+}
+
+/* ---------- charts ---------- */
+function svg(w,h,inner,label){return `<svg viewBox="0 0 ${w} ${h}" width="100%" role="img" aria-label="${label}" style="display:block;height:auto">${inner}</svg>`}
+function renderSweep(sc){
+  const j=KEYS.indexOf("reach"), sw=sweep(state.w,j), W=640,H=300,L=40,R=12,T=12,B=40;
+  const X=x=>L+(W-L-R)*x/100, Y=y=>T+(H-T-B)*(1-y/100);
+  let g="";
+  [0,25,50,75,100].forEach(v=>{g+=`<line x1="${L}" x2="${W-R}" y1="${Y(v)}" y2="${Y(v)}" stroke="var(--line)"/><text x="${L-6}" y="${Y(v)+4}" text-anchor="end">${v}</text>`});
+  [0,20,40,60,80,100].forEach(v=>{g+=`<text x="${X(v)}" y="${H-20}" text-anchor="middle">${v}%</text>`});
+  g+=`<text x="${(L+W-R)/2}" y="${H-3}" text-anchor="middle">Weight on audience reach</text>`;
+  const lead=sc.indexOf(Math.max(...sc));
+  S.forEach((s,i)=>{const d=sw.map((p,q)=>(q?"L":"M")+X(p.x)+","+Y(p.s[i])).join("");
+    g+=`<path d="${d}" fill="none" stroke="${COLORS[s.sport]}" stroke-width="${i===lead?3.4:2}" opacity="${i===lead?1:.85}"/>`;
+    const last=sw[sw.length-1]; });
+  const cur=normW(state.w)[j]*100;
+  g+=`<line x1="${X(cur)}" x2="${X(cur)}" y1="${T}" y2="${H-B}" stroke="var(--ink)" stroke-dasharray="4 3"/><text class="ttl" x="${X(cur)+5}" y="${T+11}">your weight</text>`;
+  g+=`<line id="guide" x1="0" x2="0" y1="${T}" y2="${H-B}" stroke="var(--accent)" opacity="0"/>`;
+  const legend=S.map(s=>`<span><i style="background:${COLORS[s.sport]}"></i>${s.sport}</span>`).join("");
+  $("#sweep").innerHTML=svg(W,H,g,"Line chart of each sport's score against the weight on reach")+`<div class="legend">${legend}</div>`;
+  const el=$("#sweep svg"), guide=$("#guide"), tip=$("#tip");
+  el.onpointermove=e=>{const r=el.getBoundingClientRect(), px=(e.clientX-r.left)/r.width*W;
+    const x=Math.max(0,Math.min(100,(px-L)/(W-L-R)*100)); if(px<L||px>W-R){el.onpointerleave();return}
+    const p=sw[Math.round(x)]; guide.setAttribute("x1",X(p.x));guide.setAttribute("x2",X(p.x));guide.setAttribute("opacity","1");
+    const rows=S.map((s,i)=>[s.sport,p.s[i]]).sort((a,b)=>b[1]-a[1]).map(([n,v])=>`${n}: ${fmt1(v)}`).join("<br>");
+    tip.innerHTML=`<b>Reach at ${Math.round(p.x)}%</b><br>${rows}`;tip.style.display="block";tip.style.left=Math.min(e.clientX+14,innerWidth-230)+"px";tip.style.top=(e.clientY+14)+"px"};
+  el.onpointerleave=()=>{guide.setAttribute("opacity","0");tip.style.display="none"};
+  const ci=S.findIndex(s=>s.sport==="Cricket"), be=breakEven(sw,ci);
+  $("#sweepNote").innerHTML = be===null?"Cricket does not lead at any weight on reach with your other priorities.":
+    `With your other priorities, cricket only takes first place once reach counts for about <b>${Math.round(be)}%</b> of the decision. You currently give it <b>${Math.round(cur)}%</b>.`;
+}
+function renderScatter(){
+  const W=420,H=320,L=44,R=14,T=12,B=42, X=v=>L+(W-L-R)*v/10, Y=v=>T+(H-T-B)*(1-v/10);
+  let g="";
+  [0,2.5,5,7.5,10].forEach(v=>{g+=`<line x1="${L}" x2="${W-R}" y1="${Y(v)}" y2="${Y(v)}" stroke="var(--line)"/><text x="${L-6}" y="${Y(v)+4}" text-anchor="end">${v}</text><text x="${X(v)}" y="${H-24}" text-anchor="middle">${v}</text>`});
+  g+=`<text x="${(L+W-R)/2}" y="${H-6}" text-anchor="middle">Cost efficiency (10 = cheapest per unit of reach)</text><text transform="translate(11,${(T+H-B)/2}) rotate(-90)" text-anchor="middle">Audience reach</text>`;
+  const pts=S.map(s=>({s,r:5+s.audience_fit*1.5,x:X(s.cost_efficiency),y:Y(s.reach)}));
+  pts.forEach(p=>{g+=`<circle cx="${p.x}" cy="${p.y}" r="${p.r}" fill="${COLORS[p.s.sport]}" fill-opacity=".72" stroke="var(--surface)" stroke-width="2"/>`});
+  const placed=[]; pts.slice().sort((a,b)=>a.y-b.y).forEach(p=>{
+    const left=p.x>W*.6; let ly=p.y+4;
+    while(placed.some(q=>Math.abs(q.y-ly)<13&&Math.abs(q.x-p.x)<90))ly+=13;
+    placed.push({x:p.x,y:ly}); const lx=left?p.x-p.r-4:p.x+p.r+4;
+    g+=`<text class="ttl" x="${lx}" y="${ly}" text-anchor="${left?"end":"start"}">${p.s.sport}</text>`});
+  $("#scatter").innerHTML=svg(W,H,g,"Bubble chart of reach against cost efficiency");
+}
+function renderRadar(){
+  if(!state.radar){const o=S.map((s,i)=>[wsm(state.w)[i],i]).sort((a,b)=>b[0]-a[0]).slice(0,3).map(x=>x[1]);state.radar=new Set(o)}
+  $("#radarChips").innerHTML=S.map((s,i)=>`<button class="chip" data-i="${i}" aria-pressed="${state.radar.has(i)}">${s.sport}</button>`).join("");
+  document.querySelectorAll("#radarChips .chip").forEach(b=>b.onclick=()=>{const i=+b.dataset.i;state.radar.has(i)?state.radar.delete(i):state.radar.add(i);renderRadar()});
+  const W=470,H=360,cx=W/2,cy=H/2+4,rad=96,n=KEYS.length;
+  const pt=(j,v)=>{const a=-Math.PI/2+2*Math.PI*j/n;return[cx+rad*v/10*Math.cos(a),cy+rad*v/10*Math.sin(a)]};
+  let g="";
+  [2.5,5,7.5,10].forEach(v=>{g+=`<polygon points="${KEYS.map((_,j)=>pt(j,v).join(",")).join(" ")}" fill="none" stroke="var(--line)"/>`});
+  KEYS.forEach((k,j)=>{const [x,y]=pt(j,10),[lx,ly]=pt(j,11.9);g+=`<line x1="${cx}" y1="${cy}" x2="${x}" y2="${y}" stroke="var(--line)"/><text x="${lx}" y="${ly+4}" text-anchor="${lx<cx-4?"end":lx>cx+4?"start":"middle"}" style="font-size:13.5px">${C[j].label}</text>`});
+  [...state.radar].forEach(i=>{const s=S[i];g+=`<polygon points="${KEYS.map((k,j)=>pt(j,s[k]).join(",")).join(" ")}" fill="${COLORS[s.sport]}" fill-opacity=".14" stroke="${COLORS[s.sport]}" stroke-width="2.4"/>`});
+  $("#radar").innerHTML=svg(W,H,g,"Radar chart comparing selected sports across the seven criteria");
+}
+let mcTimer;
+function renderMC(){
+  clearTimeout(mcTimer);
+  mcTimer=setTimeout(()=>{
+    const conc=+$("#conc").value; $("#concV").textContent=conc<15?"high":conc<35?"moderate":"low";
+    const P=monteCarlo(state.w,conc), W=640,H=260,L=40,R=10,T=22,B=38, bw=(W-L-R)/S.length;
+    let g="";
+    [0,25,50,75,100].forEach(v=>{const y=T+(H-T-B)*(1-v/100);g+=`<line x1="${L}" x2="${W-R}" y1="${y}" y2="${y}" stroke="var(--line)"/><text x="${L-6}" y="${y+4}" text-anchor="end">${v}%</text>`});
+    S.forEach((s,i)=>{const v=P[i][0]*100,h=(H-T-B)*v/100,x=L+i*bw+bw*.18;
+      g+=`<rect x="${x}" y="${H-B-h}" width="${bw*.64}" height="${Math.max(h,1)}" rx="4" fill="${COLORS[s.sport]}"/><text class="ttl" x="${x+bw*.32}" y="${H-B-h-5}" text-anchor="middle">${Math.round(v)}%</text><text x="${x+bw*.32}" y="${H-18}" text-anchor="middle">${s.sport}</text>`});
+    $("#mc").innerHTML=svg(W,H,g,"Bar chart of how often each sport ranks first in the simulation");
+    const head=`<thead><tr><th>Sport</th>${S.map((_,r)=>`<th style="text-align:center">#${r+1}</th>`).join("")}</tr></thead>`;
+    const body=S.map((s,i)=>`<tr><td><b>${s.sport}</b></td>${P[i].map(v=>`<td class="c" style="background:color-mix(in srgb,var(--accent) ${Math.round(v*70)}%,transparent)">${Math.round(v*100)}%</td>`).join("")}</tr>`).join("");
+    $("#mcTable").innerHTML=head+`<tbody>${body}</tbody>`;
+  },60);
+}
+function renderBudget(sc){
+  const b=+$("#bud").value, r=+$("#res").value; $("#budV").textContent="₹"+b+" crore"; $("#resV").textContent=r+"%";
+  const rows=allocate(sc,b,r), cols=[COLORS[rows[0].name],COLORS[rows[1].name],"#8B9BA3"];
+  let x=0, g="";
+  rows.forEach((q,i)=>{const w=q.pct/100*600;g+=`<rect x="${x}" y="8" width="${w}" height="34" fill="${cols[i]}" ${i===0?'rx="6"':''}/>${w>70?`<text x="${x+8}" y="30" style="fill:#fff;font-weight:600">${Math.round(q.pct)}%</text>`:""}`;x+=w});
+  $("#budBar").innerHTML=svg(600,50,g,"Stacked bar showing the budget split");
+  $("#budTable").innerHTML=`<thead><tr><th>Where the money goes</th><th>Fit index</th><th>Share</th><th>Amount (₹ crore)</th></tr></thead><tbody>${rows.map(q=>`<tr><td>${q.name}</td><td class="num">${q.score==null?"–":fmt1(q.score)}</td><td class="num">${fmt1(q.pct)}%</td><td class="num">${q.cr.toFixed(2)}</td></tr>`).join("")}</tbody>`;
+}
+
+/* ---------- data tab ---------- */
+function buildData(){
+  $("#dataWarn").innerHTML=`<b>Read this first.</b> Reach is built from published audience data. The other six scores are our expert ratings, backed by the notes in each row, not measured values. ${DATA.notes}`;
+  const head=`<thead><tr><th>Sport</th>${C.map(c=>`<th>${c.label}</th>`).join("")}<th>Audience base</th></tr></thead>`;
+  $("#modelTable").innerHTML=head+`<tbody>${S.map(s=>`<tr><td><b>${s.sport}</b></td>${C.map(c=>`<td class="num">${s[c.key]%1?s[c.key].toFixed(1):s[c.key]}</td>`).join("")}<td class="num">${s.reach_imputed?"not comparable":Math.round(s.audience_base_m)+"M"}</td></tr>`).join("")}</tbody>`;
+  $("#rawTable").innerHTML=`<thead><tr><th>Sport</th><th>Indicator</th><th>Value</th><th>Year</th><th>Quality</th><th>Source</th></tr></thead><tbody>${DATA.raw.map(r=>`<tr><td>${r.sport}</td><td>${r.indicator.replace(/_/g," ")}${r.used_in_model==1?' <span class="tag data">used</span>':""}</td><td class="num">${r.value===""?"missing":Number(r.value).toLocaleString("en-IN")+(r.unit.startsWith("million")?" M":r.unit==="percent"?"%":"")}</td><td>${r.year}</td><td class="q-${r.quality}">${r.quality}</td><td>${r.url?`<a href="${r.url}" target="_blank" rel="noopener">${r.source}</a>`:r.source}${r.note?`<br><small style="color:var(--muted)">${r.note}</small>`:""}</td></tr>`).join("")}</tbody>`;
+  $("#cleanLog").innerHTML=DATA.log.map(l=>`<li>${l.replace(/^Step \d+:\s*/,"")}</li>`).join("");
+}
+
+/* ---------- main ---------- */
+function render(){
+  const sc=wsm(state.w); updateSliderLabels();
+  const order=renderBoard(sc); renderHeadline(sc,order);
+  if(state.tab==="trade"){renderSweep(sc);renderScatter();renderRadar()}
+  if(state.tab==="robust")renderMC();
+  if(state.tab==="strategy")renderBudget(sc);
+  if(state.open!==null)renderDetail();
+}
+function initTabs(){
+  document.querySelectorAll(".tab").forEach(t=>t.onclick=()=>{
+    state.tab=t.dataset.p;
+    document.querySelectorAll(".tab").forEach(x=>x.setAttribute("aria-selected",x===t));
+    document.querySelectorAll(".panel").forEach(p=>p.classList.toggle("on",p.id==="p-"+state.tab));
+    render();
+  });
+}
+function initTheme(){
+  const root=document.documentElement;
+  try{const t=localStorage.getItem("sf-theme");if(t)root.setAttribute("data-theme",t)}catch(e){}
+  $("#themeBtn").onclick=()=>{
+    const dark=root.getAttribute("data-theme")==="dark"||(!root.getAttribute("data-theme")&&matchMedia("(prefers-color-scheme: dark)").matches);
+    const next=dark?"light":"dark"; root.setAttribute("data-theme",next); try{localStorage.setItem("sf-theme",next)}catch(e){}
+  };
+}
+buildControls();buildBoard();buildData();initTabs();initTheme();syncSliders();
+["conc"].forEach(id=>$("#"+id).addEventListener("input",renderMC));
+["bud","res"].forEach(id=>$("#"+id).addEventListener("input",()=>renderBudget(wsm(state.w))));
+render();
+window.SF={wsm,topsis,sweep,breakEven,monteCarlo,allocate,state,DATA,KEYS};
+})();
+</script>
+</body>
+</html>

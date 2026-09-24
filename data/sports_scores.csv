@@ -1,0 +1,7 @@
+sport,property,reach,audience_fit,engagement,image_congruence,cost_efficiency,growth,risk_safety,audience_base_m,reach_imputed,rationale,confidence
+Cricket,IPL / WPL,10.0,8,9,6,2,7,7,612.0,False,Cricket = ~81% of sponsorship spend (2025) so inventory is expensive and cluttered; fans skew 18-44; IPL TV watch time up 22% in 2025 opening weekend; generic image fit for a health brand.,Medium
+Kabaddi,Pro Kabaddi League (PKL),3.6,8,7,8,8,8,7,280.0,False,Most-watched non-cricket league; regional-language broadcasts; physical/strength image suits nutrition; sponsor retention reported positive; S11 reach dipped vs S10.,Medium
+Football,Indian Super League (ISL),4.08,7,6,7,6,6,4,305.0,False,"Strong regional pockets (Kerala, Goa, Bengal, NE); ISL TV reach fell from 168M (2018-19) to 81M (2023) and league finances have been unstable, so risk is high.",Low
+Badminton,Badminton (PBL / BWF events / star athletes),1.0,7,6,8,7,6,6,145.0,False,Star-athlete driven; endorsement route cheaper than league sponsorship; strong health image but dependence on a few athletes.,Low
+Hockey,Hockey India League / national team,1.17,6,5,7,8,6,6,154.0,False,Cost-efficient but interest spikes mainly around Olympics; limited league commercial ecosystem.,Low
+Running,Distance running / marathons / athletics,1.0,9,7,10,8,8,8,145.0,True,"Participants match the health-conscious 18-34 buyer; record turnouts (e.g. 69,000+ at Tata Mumbai Marathon 2026, TCS World 10K +21.5%); direct sampling possible; distance running reported as a large share of non-cricket sponsorship.",Medium

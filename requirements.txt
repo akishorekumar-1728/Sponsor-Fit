@@ -1,0 +1,7 @@
+pandas
+numpy
+scipy
+scikit-learn
+matplotlib
+streamlit
+pytrends   # optional, only for fetch_trends.py

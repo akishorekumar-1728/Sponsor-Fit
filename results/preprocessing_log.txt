@@ -1,0 +1,6 @@
+Raw indicator rows: 19; sports: 6; expert-rated sports: 6
+Step 1: yardstick = Ormax audience_base (million people).
+Step 2: conflicting value for Kabaddi (208.0M from Exchange4media / Indian Television (reporting Ormax)) ignored; primary source value 280M used.
+Step 3: Running has no comparable audience base -> imputed with observed minimum (145M); flagged as imputed because participation, not TV/OTT viewing, is its reach.
+Step 4: min-max scaling reach = 1 + 9*(x - 145)/(612 - 145).
+Step 5: saved 6 rows x 13 columns to sports_scores.csv
